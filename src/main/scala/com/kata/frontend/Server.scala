@@ -31,7 +31,7 @@ class Server extends StrictLogging with ChatfuelAction with ChatfuelAttribute {
 
   def init(): Unit = {
 
-    logger.info("INIT")
+    logger.info("Init Server...")
 
     val conf = ConfigFactory.load()
 
@@ -90,12 +90,11 @@ class Server extends StrictLogging with ChatfuelAction with ChatfuelAttribute {
   implicit val implListContainer = jsonFormat1(ListContainer)
   implicit val implMessagesWithLists = jsonFormat1(Messages[ListContainer])
 
-  val pathStr = "chatfuelWebHook"
+  val pathStr = "chatfuelWebHookExample"
 
   def route = path(pathStr) {
     get {
       parameterSeq { params =>
-
         var incomingParameters: RequestParameters = new RequestParameters(params.toString())
         complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "GET OK"))
       }
@@ -111,64 +110,53 @@ class Server extends StrictLogging with ChatfuelAction with ChatfuelAttribute {
           val lastname = getLastname
 
           if (userInput.equalsIgnoreCase("Hi")) {
-
+            // reply with text
             val messages = replyWithTextMessages(Array[String]("hello " + firstname, "ciao Mr " + lastname))
             complete(messages)
-
           } else if (userInput.equals("Hello")) {
-
+            // reply with 2 text messages
             var messages = replyWithAttachments(Array[(String, String)](("image", "https://rockets.chatfuel.com/assets/welcome.png")))
             complete(messages)
-
-          } else if (userInput.equalsIgnoreCase("Hiya")) {
-
+          } else if (userInput.equalsIgnoreCase("Video")) {
+            // reply with video
             var messages = replyWithAttachments(Array[(String, String)](("video", "https://rockets.chatfuel.com/assets/video.mp4")))
             complete(messages)
-
           } else if (userInput.equalsIgnoreCase("Audio")) {
-
+            // reply with audio
             var messages = replyWithAttachments(Array[(String, String)](("audio", "https://rockets.chatfuel.com/assets/hello.mp3")))
             complete(messages)
-
           } else if (userInput.equalsIgnoreCase("File")) {
-
+            // reply with PDF
             var messages = replyWithAttachments(Array[(String, String)](("file", "https://rockets.chatfuel.com/assets/ticket.pdf")))
             complete(messages)
-
           } else if (userInput.equalsIgnoreCase("Quick")) {
-
+            // reply with Quick Reply
             var messages = replyWithQuickReplies("Did you like it", Array[(String, String, String)](("Yes!", "https://rockets.chatfuel.com/api/sad-match", "json_plugin_url")))
-
             complete(messages)
-
           } else if (userInput.equalsIgnoreCase("Quick2")) {
-
+            // reply with Quick Reply (with predefined AI blocks)
             var list = List[String]("BL1");
+
             var messages = replyWithQuickReplies("Did you like it", Array[(String, List[String])](("Yes!", list)))
             complete(messages)
-
           } else if (userInput.equalsIgnoreCase("Gallery")) {
-
+            // reply with Gallery
             var bt1 = Button("web_url", "https://rockets.chatfuel.com/store", "View Item")
             var element1 = Element("Chatfuel Rockets Jersey", "https://rockets.chatfuel.com/assets/shirt.jpg", "Size: M", List[Button](bt1))
             var galleryPayload = GalleryPayload("generic", "square", List[Element](element1))
             var gallery = Gallery("template", galleryPayload)
 
             var messages = replyWithGalleries(GalleryContainer(gallery))
-
             complete(messages)
-
           } else if (userInput.equalsIgnoreCase("List")) {
-
+            // reply with List
             var bt1 = Button("web_url", "https://rockets.chatfuel.com/store", "View Item")
             var element1 = Element("Chatfuel Rockets Jersey", "https://rockets.chatfuel.com/assets/shirt.jpg", "Size: M", List[Button](bt1))
             var listPayload = ListPayload("list", "large", List[Element](element1))
             var list = ListItem("template", listPayload)
 
             var messages = replyWithLists(ListContainer(list))
-
             complete(messages)
-
           } else {
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "POST OK"))
           }
